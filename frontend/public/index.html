@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>C-NEWS | Community Narrative Early Warning System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --primary:#1F3A5F;
+      --bg:#F7F9FC;
+      --card:#FFFFFF;
+      --text:#2E2E2E;
+      --muted:#6B7280;
+      --border:#E5E7EB;
+      --low:#6FBF8A;
+      --medium:#F4B400;
+      --high:#E07A5F;
+    }
+    body {
+      margin:0;
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    header {
+      background:#fff;
+      padding:16px 24px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    h1 { margin:0; font-size:22px; color:var(--primary); }
+    main { padding:24px; }
+    .grid {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:16px;
+      margin-bottom:24px;
+    }
+    .card {
+      background:var(--card);
+      padding:16px;
+      border-radius:8px;
+      box-shadow:0 1px 3px rgba(0,0,0,.06);
+    }
+    .value {
+      font-size:28px;
+      font-weight:600;
+      margin-top:8px;
+    }
+    .section {
+      margin-bottom:24px;
+    }
+    footer {
+      padding:16px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div>
+    <h1>C-NEWS</h1>
+    <div style="font-size:13px;color:var(--muted)">Community Narrative Early Warning System</div>
+  </div>
+  <div style="font-size:13px">State – Demo Environment</div>
+</header>
+
+<main>
+
+  <!-- OVERVIEW -->
+  <div class="grid">
+    <div class="card">
+      <div>Overall Narrative Risk</div>
+      <div class="value" style="color:var(--medium)">MODERATE</div>
+    </div>
+    <div class="card">
+      <div>Active Narratives</div>
+      <div class="value">3</div>
+    </div>
+    <div class="card">
+      <div>Risk Change (72 hrs)</div>
+      <div class="value">+18%</div>
+    </div>
+  </div>
+
+  <!-- TREND -->
+  <div class="section card">
+    <h3>Narrative Risk Trend (Last 7 Days)</h3>
+    <canvas id="trendChart" height="90"></canvas>
+  </div>
+
+  <!-- EXPLANATION -->
+  <div class="section card">
+    <h3>Explainability Snapshot</h3>
+    <p><strong>Why flagged:</strong> Repeated hostile framing patterns observed across public content.</p>
+    <p><strong>Confidence:</strong> Medium</p>
+  </div>
+
+</main>
+
+<footer>
+  C-NEWS provides advisory, narrative-level early warning only.  
+  No individual identification or automated enforcement is performed.
+</footer>
+
+<script>
+const ctx = document.getElementById('trendChart');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: ['Day 1','Day 2','Day 3','Day 4','Day 5','Day 6','Day 7'],
+    datasets: [{
+      label: 'Narrative Risk Index',
+      data: [32,35,40,48,55,58,62],
+      borderColor: '#1F3A5F',
+      tension: 0.3
+    }]
+  },
+  options: {
+    plugins:{ legend:{ display:false } },
+    scales:{ y:{ beginAtZero:true, max:100 } }
+  }
+});
+</script>
+
+</body>
+</html>
