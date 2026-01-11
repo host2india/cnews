@@ -72,7 +72,7 @@
     <h1>C-NEWS</h1>
     <div style="font-size:13px;color:var(--muted)">Community Narrative Early Warning System</div>
   </div>
-  <div style="font-size:13px">State – Demo Environment</div>
+  <div id="environmentLabel" style="font-size:13px"></div>
 </header>
 
 <main>
@@ -81,15 +81,15 @@
   <div class="grid">
     <div class="card">
       <div>Overall Narrative Risk</div>
-      <div class="value" style="color:var(--medium)">MODERATE</div>
+     <div id="overallRisk" class="value"></div>
     </div>
     <div class="card">
       <div>Active Narratives</div>
-      <div class="value">3</div>
+      <div id="activeNarratives" class="value"></div>
     </div>
     <div class="card">
       <div>Risk Change (72 hrs)</div>
-      <div class="value">+18%</div>
+      <div id="riskChange" class="value"></div>
     </div>
   </div>
 
@@ -102,9 +102,15 @@
   <!-- EXPLANATION -->
   <div class="section card">
     <h3>Explainability Snapshot</h3>
-    <p><strong>Why flagged:</strong> Repeated hostile framing patterns observed across public content.</p>
-    <p><strong>Confidence:</strong> Medium</p>
+    <p><strong>Why flagged:</strong> <span id="explainReason"></span></p>
+<p><strong>Confidence:</strong> <span id="confidenceLevel"></span></p>
+
   </div>
+  <!-- NARRATIVE DETAILS -->
+<div class="section card">
+  <h3>Narrative Details (Sample)</h3>
+  <div id="narrativeList"></div>
+</div>
 
 </main>
 
@@ -114,23 +120,81 @@
 </footer>
 
 <script>
-const ctx = document.getElementById('trendChart');
-new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: ['Day 1','Day 2','Day 3','Day 4','Day 5','Day 6','Day 7'],
-    datasets: [{
-      label: 'Narrative Risk Index',
-      data: [32,35,40,48,55,58,62],
-      borderColor: '#1F3A5F',
-      tension: 0.3
-    }]
-  },
-  options: {
-    plugins:{ legend:{ display:false } },
-    scales:{ y:{ beginAtZero:true, max:100 } }
-  }
-});
+fetch("data/demo-data.json")
+  .then(res => res.json())
+  .then(data => {
+
+    // Header
+    document.getElementById("environmentLabel").innerText = data.environment;
+
+    // Overview
+    const riskEl = document.getElementById("overallRisk");
+    riskEl.innerText = data.overview.overallRisk;
+
+    if (data.overview.overallRiskLevel === "low") {
+      riskEl.style.color = "var(--low)";
+    } else if (data.overview.overallRiskLevel === "medium") {
+      riskEl.style.color = "var(--medium)";
+    } else {
+      riskEl.style.color = "var(--high)";
+    }
+
+    document.getElementById("activeNarratives").innerText =
+      data.overview.activeNarratives;
+
+    document.getElementById("riskChange").innerText =
+      data.overview.riskChange72h;
+
+    // Explainability
+    document.getElementById("explainReason").innerText =
+      data.explainability.reason;
+
+    document.getElementById("confidenceLevel").innerText =
+      data.explainability.confidence;
+
+    // Chart
+    const ctx = document.getElementById("trendChart");
+    new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: data.trend.labels,
+        datasets: [{
+          label: "Narrative Risk Index",
+          data: data.trend.values,
+          borderColor: "#1F3A5F",
+          tension: 0.3
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, max: 100 } }
+      }
+    });
+
+    // Narrative Details (IMPORTANT: outside Chart)
+    const list = document.getElementById("narrativeList");
+    data.narratives.forEach(n => {
+      const item = document.createElement("div");
+      item.style.borderTop = "1px solid var(--border)";
+      item.style.padding = "12px 0";
+
+      item.innerHTML = `
+        <strong>${n.title}</strong>
+        <p style="margin:6px 0;color:var(--muted)">${n.summary}</p>
+        <ul>
+          ${n.indicators.map(i => `<li>${i}</li>`).join("")}
+        </ul>
+        <div style="font-size:13px;color:var(--muted)">
+          Trend: <strong>${n.trend}</strong> · Confidence: <strong>${n.confidence}</strong>
+        </div>
+      `;
+      list.appendChild(item);
+    });
+
+  })
+  .catch(err => {
+    console.error("Demo data load failed:", err);
+  });
 </script>
 
 </body>
